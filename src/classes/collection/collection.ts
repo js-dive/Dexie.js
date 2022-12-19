@@ -49,6 +49,11 @@ export class Collection implements ICollection {
       ctx.table._trans('readonly', fn).then(cb);
   }
 
+  /**
+   * 创建一个读写事务
+   * @param fn 读写事务回调函数。有关数据库的所有操作在此回调函数中进行
+   * @returns 
+   */
   _write<T>(fn: (idbtrans: IDBTransaction, dxTrans: Transaction) => PromiseLike<T>): PromiseExtended<T> {
     var ctx = this._ctx;
     return ctx.error ?
@@ -500,8 +505,9 @@ export class Collection implements ICollection {
 
         const nextChunk = (offset: number) => {
           const count = Math.min(limit, keys.length - offset);
+          // 获得要更改的值？
           return coreTable.getMany({
-            trans,
+            trans, // 此处需要传入当前事务
             keys: keys.slice(offset, offset + count),
             cache: "immutable" // Optimize for 2 things:
             // 1) observability-middleware can track changes better.
@@ -551,6 +557,7 @@ export class Collection implements ICollection {
                 })
             ).then(()=>(putValues.length > 0 || (criteria && typeof changes === 'object')) &&
                 coreTable.mutate({
+                  // 同样传入当前事务
                   trans,
                   type: 'put',
                   keys: putKeys,

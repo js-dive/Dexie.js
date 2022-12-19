@@ -40,6 +40,16 @@ export class Table implements ITable<any, IndexableType> {
     const trans: Transaction = this._tx || PSD.trans;
     const tableName = this.name;
     
+    /**
+     * 检查table是否在事务范围内
+     * 不在，直接抛错
+     * 在，则继续其他操作
+     *
+     * @param resolve 
+     * @param reject 
+     * @param trans 
+     * @returns 
+     */
     function checkTableInTransaction(resolve, reject, trans: Transaction) {
       if (!trans.schema[tableName])
         throw new exceptions.NotFound("Table " + tableName + " not part of transaction");

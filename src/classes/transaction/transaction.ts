@@ -114,6 +114,7 @@ export class Transaction implements ITransaction {
     if (!this.active) throw new exceptions.TransactionInactive();
     assert(this._completion._state === null); // Completion Promise must still be pending.
 
+    // 事务在此被真正地创建
     idbtrans = this.idbtrans = idbtrans ||
       (this.db.core 
         ? this.db.core.transaction(this.storeNames, this.mode as 'readwrite' | 'readonly', { durability: this.chromeTransactionDurability })
